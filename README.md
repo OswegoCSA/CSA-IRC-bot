@@ -17,6 +17,8 @@ In config.json fill in the necessary fields.
     * From field may be formatted as follows: `Charlie Brown <user@example.com>`
   * `notify.to` is the email where to send any notifications to.
   * `notify.subject` is the default subject field of any emails that will be sent.
+  * `notify.textMessage` is true if you are sending the message as an sms.
+  * `mailer.interval` is the minimum time in milliseconds before sending another email
 
 ##TODO:
   * Module hooks. --Create an app structure so new features can be added in easily with hooks.   

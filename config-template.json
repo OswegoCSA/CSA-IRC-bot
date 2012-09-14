@@ -22,11 +22,13 @@
 	"mailer": {
 		"service": "Gmail",
 		"user": "<SMTP username>",
-		"pass": "<SMTP password>"
+		"pass": "<SMTP password>",
+		"interval": "10000"
 	},
 	"notify": {
 		"from": "<from name> <<from email>>",
 		"to": "<email>",		
-		"subject": "IRC"
+		"subject": "IRC",
+		"textMessage": false
 	}
 }

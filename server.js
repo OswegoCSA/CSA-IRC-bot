@@ -10,7 +10,7 @@ try {
 }
 
 
-// Mailer =======================================================
+// Mailer ================================================================
 var nodemailer = require("nodemailer");
 
 // create reusable transport method (opens pool of SMTP connections)
@@ -20,8 +20,10 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
     	//name: "client server name",
         user: config.mailer.user,
         pass: config.mailer.pass
-    }
+    },
+    maxConnections: 1
 });
+// END Mailer ============================================================
 
 // setup e-mail data with unicode symbols
 function mailOptions(message) {
@@ -29,11 +31,33 @@ function mailOptions(message) {
 	    from: config.notify.from, // sender address
 	    to: config.notify.to, // list of receivers
 	    //replyTo: "" // replyTo address - don't really need it
-	    subject: config.notify.subject || "IRC", // Subject line
+	    subject: config.notify.subject, // Subject line
 	    text: message || "You got an irc message", // plaintext body
 	    html: message || "You got an irc message" // html body	    
 	}	
 }
+
+// This is just a mail queue that will check every 5 seconds 
+// and send the message if there is any
+var mailQueue = [];
+function sendMail(){
+	if(mailQueue.length != 0){		
+		var message = mailQueue.shift();
+		smtpTransport.sendMail(message, function(error, response){
+			if(error){
+				console.log(error);
+			}else{
+				console.log("Message sent: " + response.message);
+			}
+		    
+		    // I have to close it every time because the messages arrive out of order. 
+		    // If anyone has a better solution send a pull request.
+		    // if you don't want to use this transport object anymore, uncomment following line
+		    smtpTransport.close(); // shut down the connection pool, no more messages
+		})
+	}
+}
+setInterval(function(){ sendMail() }, 10000);
 
 /*
 * To set the key/cert explicitly, you could do the following
@@ -48,12 +72,12 @@ var options = {
 var irc = require('irc');
 var bot = new irc.Client(config.options.server, config.options.nick, config.options);
 
-bot.on('message#', function (nick, to, message, raw) {
+bot.on('message#', function (from, to, message, raw) {
     //console.log('<%s> %s', from, message);
     if(message.match(/poorman/)){
     	// send me an email or something
-    	console.log("got a message for me");
-		bot.emit('notify', message);
+    	console.log("got a message for me");    	
+		bot.emit('notify', message, from);
     }
 });
 
@@ -90,24 +114,22 @@ bot.on('error', function(message) {
     console.error('ERROR: %s: %s', message.command, message.args.join(' '));
 });
 
-bot.on('notify', function(message)){
-	var mailOpts = mailOptions(message);	
-	var subjectSize = mailOpts.subject.length + 3; // 3 for 2 paren and a space for the subject
-	var charLimit = 140;
-	var chunkSize = charLimit - subjectSize;
-	var re = new RegExp(".{1," + chunkSize + "}", "g");
-	var chunks = message.match(re);
-	smtpTransport.sendMail(mailOptions(message), function(error, response){
-		if(error){
-			console.log(error);
-		}else{
-			console.log("Message sent: " + response.message);
+bot.on('notify', function(message, from){
+	//var chunkedMailOpts = [];
+	var userTag = '[' + from + ']> ';
+	if(config.notify.textMessage){		
+		var subjectSize = config.notify.subject.length + 3; // 3 for 2 paren and a space for the subject
+		var charLimit = 140;
+		var chunkSize = charLimit - subjectSize - userTag.length;
+		var re = new RegExp('.{1,' + chunkSize + '}\\W', "g");
+		var chunks = message.match(re);
+		for(var i = 0; i < chunks.length; i++){
+			mailQueue.push(mailOptions(userTag + chunks[i]));
 		}
-
-	    // if you don't want to use this transport object anymore, uncomment following line
-	    //smtpTransport.close(); // shut down the connection pool, no more messages
-	});
-});
+	} else {
+		mailQueue.push(mailOptions(userTag + message));
+	}
+})
 
 // See http://node-irc.readthedocs.org/en/latest/API.html#events
 
