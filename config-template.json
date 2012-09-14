@@ -1,0 +1,32 @@
+{
+	"options": {
+		"server": "irc.freenode.net",
+		"nick": "DoubleBuffer",
+		"realName": "OswegoCSA Helper",
+		"port": 6697,
+		"debug": true,
+		"showErrors": true,
+		"autoRejoin": true,
+		"autoConnect": true,
+		"channels": ["#OswegoCSATEST"],
+		"secure": true,
+		"selfSigned": true,
+		"certExpired": false,
+		"floodProtection": true,
+		"floodProtectionDelay": 1000,
+		"stripColors": false
+	},
+	"ident": {
+		"password": "<IRC nickserv password>"
+	},
+	"mailer": {
+		"service": "Gmail",
+		"user": "<SMTP username>",
+		"pass": "<SMTP password>"
+	},
+	"notify": {
+		"from": "<from name> <<from email>>",
+		"to": "<email>",		
+		"subject": "IRC"
+	}
+}
