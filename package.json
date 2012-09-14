@@ -1,6 +1,6 @@
 
   "name": "csa-irc-bot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Nick Poorman <nickpoorman@gmail.com>",
   "description": "a simple bot to help manage the #OswegoCSA irc channel",
   "contributors": [],
