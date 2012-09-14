@@ -42,7 +42,7 @@ function mailOptions(message) {
 var mailQueue = [];
 function sendMail(){
 	if(mailQueue.length != 0){		
-		var message = mailQueue.shift();
+	    var message = mailQueue.shift();
 		smtpTransport.sendMail(message, function(error, response){
 			if(error){
 				console.log(error);
