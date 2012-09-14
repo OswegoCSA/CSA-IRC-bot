@@ -46,6 +46,8 @@ function sendMail(){
 		smtpTransport.sendMail(message, function(error, response){
 			if(error){
 				console.log(error);
+				// add the message back to the queue cause to try again later
+				mailQueue.push(message);
 			}else{
 				console.log("Message sent: " + response.message);
 			}
