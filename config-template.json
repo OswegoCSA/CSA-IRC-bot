@@ -8,7 +8,7 @@
 		"showErrors": true,
 		"autoRejoin": true,
 		"autoConnect": true,
-		"channels": ["#OswegoCSATEST"],
+		"channels": ["#OswegoCSA"],
 		"secure": true,
 		"selfSigned": true,
 		"certExpired": false,
